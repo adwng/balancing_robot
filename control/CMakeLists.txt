@@ -11,16 +11,16 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2 REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
 
 add_executable(lqr_compute src/lqr_control_node.cpp)
+add_executable(pid_compute src/PID_compute_node.cpp)
 
 ament_target_dependencies(lqr_compute rclcpp sensor_msgs geometry_msgs tf2)
+ament_target_dependencies(pid_compute rclcpp sensor_msgs geometry_msgs tf2)
 
 install(TARGETS
   lqr_compute
+  pid_compute
   DESTINATION lib/${PROJECT_NAME}
 )
 

@@ -7,6 +7,7 @@
 #include "tf2/LinearMath/Matrix3x3.h"
 #include <chrono>
 #include <functional>
+#include <algorithm>
 
 class RobotState : public rclcpp::Node
 {
@@ -17,20 +18,21 @@ public:
         // Initialize state variables
         pitch_ = 0.0;
         pitch_rate_ = 0.0;
-        position = 0.0;    
-        cmd_vel_linear_ = 0.0;
-        cmd_vel_angular_ = 0.0;
+        position_ = 0.0;    
+        velocity_ = 0.0;
+
+        // Use ROS time
+        clock_ = std::make_shared<rclcpp::Clock>(RCL_ROS_TIME);
 
         // Subscribers
         imu_subscriber_ = this->create_subscription<sensor_msgs::msg::Imu>(
             "/imu", 10, std::bind(&RobotState::imu_callback, this, std::placeholders::_1));
         
-        joints_subscriber_ = this->create_subscription<sensor_msgs::msg::JointState>(
-            "/dynamic_joint_states", 10, std::bind(&RobotState::joints_callback, this, std::placeholders::_1));
+        // joints_subscriber_ = this->create_subscription<sensor_msgs::msg::JointState>(
+        //     "/dynamic_joint_states", 10, std::bind(&RobotState::joints_callback, this, std::placeholders::_1));
 
         teleop_subscriber_ = this->create_subscription<geometry_msgs::msg::Twist>(
-            "cmd_vel_out", 10, std::bind(&RobotState::teleop_callback, this, std::placeholders::_1)
-        );
+            "cmd_vel_out", 10, std::bind(&RobotState::teleop_callback, this, std::placeholders::_1));
 
         // Publisher
         velocity_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/diff_cont/cmd_vel_unstamped", 10);
@@ -39,6 +41,7 @@ public:
             std::chrono::milliseconds(500), 
             std::bind(&RobotState::lqr_compute, this));
 
+        last_time_ = clock_->now();
     }
 
 private:
@@ -54,93 +57,87 @@ private:
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
 
-        pitch_ = pitch;
+        double alpha = 0.98; // Complementary filter constant
+        pitch_ = alpha * (pitch_ + pitch_rate_ * dt_) + (1 - alpha) * pitch;
         pitch_rate_ = msg->angular_velocity.y;
     }
 
-    void joints_callback(const sensor_msgs::msg::JointState::SharedPtr msg)
-    {
-        // Constants for wheel parameters (replace with actual values)
+    // void joints_callback(const sensor_msgs::msg::JointState::SharedPtr msg)
+    // {
+    //     double velocity_left = 0.0;
+    //     double velocity_right = 0.0;
 
-        double dt = (this->now() - last_time_).seconds();  // Time step in seconds
+    //     for (size_t i = 0; i < msg->name.size(); ++i)
+    //     {
+    //         std::string joint_name = msg->name[i];
+    //         double velocity = msg->velocity[i];
 
-        // Compute average linear velocity of the wheels
-        double velocity_left = 0.0;
-        double velocity_right = 0.0;
+    //         if (joint_name == "left_wheel_joint")
+    //             velocity_left = velocity;
+    //         else if (joint_name == "right_wheel_joint")
+    //             velocity_right = velocity;
+    //     }
 
-        // Find left and right wheel velocities based on joint names
-        for (size_t i = 0; i < msg->name.size(); ++i)
-        {
-            std::string joint_name = msg->name[i];
-            double velocity = msg->velocity[i];
-
-            // Assuming joint names indicate left and right wheels, adjust velocities accordingly
-            if (joint_name == "left_wheel_joint")
-                velocity_left = velocity;
-            else if (joint_name == "right_wheel_joint")
-                velocity_right = velocity;
-        }
-
-        // Average linear velocity of the wheels
-        double average_linear_velocity = (velocity_left + velocity_right) / 2.0;
-
-        // Update linear position (x) using integration
-        position += average_linear_velocity * dt;
-
-        // Update linear velocity (xdot)
-        velocity= average_linear_velocity;
-
-        // Optionally, update other state variables or perform additional computations
-
-        // Update last time
-        last_time_ = this->now();
-    }
+    //     double average_linear_velocity = (velocity_left + velocity_right) / 2.0;
+    //     position_ += average_linear_velocity * dt_;
+    //     velocity_ = average_linear_velocity;
+    // }
 
     void teleop_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
     {
-        // Extract linear and angular velocities from teleop message
-        cmd_vel_linear_ = msg->linear.x;
-        cmd_vel_angular_ = msg->angular.z;
+        velocity_ref_ = msg->linear.x;
+        angular_velocity_ref_ = msg->angular.z;
     }
 
     void lqr_compute()
     {
-        // State vector [pitch, pitch_rate, position, velocity]
-        std::vector<double> state = {pitch_, pitch_rate_, position, velocity};
+        auto current_time = clock_->now();
+        dt_ = (current_time - last_time_).seconds();
+        last_time_ = current_time;
 
-        // LQR gain matrix (example values)
-        float K[4] = {-1.1180, 2.0436, -24.4672, -3.7660};
+        double pitch_error = pitch_ref_ - pitch_;
+        double pitch_rate_error = pitch_rate_ref_ - pitch_rate_;
+        // double velocity_error = velocity_ref_ - velocity_; 
+        // double position_error = position_ref_ - position_;
 
-        // Compute control commands using LQR
+        // std::vector<double> state = {pitch_error, pitch_rate_error, position_error, velocity_error};
+        std::vector<double> state = {pitch_error, pitch_rate_error};
+
+        float K[4] = {-1.1180, 2.0436};
+
         double control_linear = 0.0;
-        double control_angular = 0.0;
-
-        // Calculate control based on LQR
-        for (size_t i = 0; i < 4; ++i) {
+        for (size_t i = 0; i < 3; ++i) {
             control_linear += K[i] * state[i];
         }
 
-        // Optionally, incorporate teleop commands
-        control_linear += cmd_vel_linear_;
-        control_angular += cmd_vel_angular_; 
+        control_angular_ = angular_velocity_ref_; 
 
-        // Publish control commands
         auto cmd_msg = geometry_msgs::msg::Twist();
         cmd_msg.linear.x = control_linear;
-        cmd_msg.angular.z = control_angular;
+        cmd_msg.angular.z = control_angular_;
         velocity_publisher_->publish(cmd_msg);
     }
 
     double pitch_;
     double pitch_rate_;
-    double position;
-    double velocity;
-    double cmd_vel_linear_;
-    double cmd_vel_angular_;
+    double position_;
+    double velocity_;
+
+    double velocity_ref_;
+    double angular_velocity_ref_;
+    double pitch_ref_ = 0.0;
+    double pitch_rate_ref_ = 0.0;
+    double position_ref_ = 0.0;
+
+    double control_angular_;
+
+    double dt_; // delta time
+
     rclcpp::Time last_time_;
+    rclcpp::Clock::SharedPtr clock_;
 
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_subscriber_;
-    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joints_subscriber_;
+    // rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joints_subscriber_;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr teleop_subscriber_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr velocity_publisher_;
     rclcpp::TimerBase::SharedPtr timer_;

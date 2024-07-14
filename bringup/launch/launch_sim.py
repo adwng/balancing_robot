@@ -14,6 +14,9 @@ def generate_launch_description():
     # publish TF of joints
     rsp_file = os.path.join(bringup_package_name, "launch", "rsp_launch.py")
 
+    # Publish odom
+    odom_file = os.path.join(bringup_package_name, 'launch', 'launch_odom.py')
+
     # finds for gazebo_ros_pkgs and launch it
     gazebo_prefix = get_package_share_directory("gazebo_ros")
     gazebo_file = os.path.join(gazebo_prefix, "launch", "gazebo.launch.py")
@@ -29,6 +32,10 @@ def generate_launch_description():
     rsp = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(rsp_file),
         launch_arguments={'use_sim_time': 'true'}.items()
+    )
+
+    odom = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(odom_file)
     )
 
     # Include the Gazebo launch file, provided by the gazebo_ros package
@@ -85,6 +92,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         rsp,
+        odom,
         gazebo,
         spawn_entity,
         rviz,

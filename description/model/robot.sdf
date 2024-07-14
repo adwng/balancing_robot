@@ -1,0 +1,306 @@
+<sdf version="1.6">
+<model name="GeneratedModel" canonical_link='base_link'>
+  <link name="base_link">
+    <pose>0 0.08 0 0 0 0</pose>
+    <collision name='base_link collision'>
+      <geometry>
+        <box>
+          <size>0.18 0.15 0.3</size>
+        </box>
+      </geometry>
+    </collision>
+    <visual name='base_link visual'>
+      <geometry>
+        <box>
+          <size>0.18 0.15 0.3</size>
+        </box>
+      </geometry>
+    </visual>
+    <material>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>Gazebo/Red</name>
+      </script>
+      <ambient>0 0.08437621153575764 0.913098651791473 1</ambient>
+      <diffuse>0 0.08437621153575764 0.913098651791473 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <emissive>0 0 0 1</emissive>
+    </material>
+    <inertial>
+      <mass>2.5</mass>
+      <inertia>
+        <ixx>0.023437499999999997</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.011437499999999998</iyy>
+        <iyz>0</iyz>
+        <izz>0.0255</izz>
+      </inertia>
+    </inertial>
+  </link>
+  <link name="left_wheel">
+    <pose>0 -0.08 0.18 1.5707963267948963 0 0</pose>
+    <collision name='left_wheel collision'>
+      <geometry>
+        <cylinder>
+          <radius>0.08499999999999996</radius>
+          <length>0.16999999999999993</length>
+        </cylinder>
+      </geometry>
+    </collision>
+    <visual name='left_wheel visual'>
+      <geometry>
+        <cylinder>
+          <radius>0.08499999999999996</radius>
+          <length>0.16999999999999993</length>
+        </cylinder>
+      </geometry>
+    </visual>
+    <material>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>Gazebo/Red</name>
+      </script>
+      <ambient>0.514917665367466 0.2541520943200296 0.76052450467022 1</ambient>
+      <diffuse>0.514917665367466 0.2541520943200296 0.76052450467022 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <emissive>0 0 0 1</emissive>
+    </material>
+    <inertial>
+      <mass>2</mass>
+      <inertia>
+        <ixx>0.019266666666666668</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.028900000000000006</iyy>
+        <iyz>0</iyz>
+        <izz>0.019266666666666668</izz>
+      </inertia>
+    </inertial>
+  </link>
+  <joint name="base_link_to_left_wheel" type="continuous">
+    <parent>base_link</parent>
+    <child>left_wheel</child>
+    <pose>0 -0.08 0.18 1.5707963267948963 0 0</pose>
+  </joint>
+  <link name="right_wheel">
+    <pose>0 -0.08 -0.18 1.5707963267948966 0 0.030840783524403125</pose>
+    <collision name='right_wheel collision'>
+      <geometry>
+        <cylinder>
+          <radius>0.085</radius>
+          <length>0.16999999999999998</length>
+        </cylinder>
+      </geometry>
+    </collision>
+    <visual name='right_wheel visual'>
+      <geometry>
+        <cylinder>
+          <radius>0.085</radius>
+          <length>0.16999999999999998</length>
+        </cylinder>
+      </geometry>
+    </visual>
+    <material>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>Gazebo/Red</name>
+      </script>
+      <ambient>0.47353149613845735 0.1844749944900301 0.48514994004665124 1</ambient>
+      <diffuse>0.47353149613845735 0.1844749944900301 0.48514994004665124 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <emissive>0 0 0 1</emissive>
+    </material>
+    <inertial>
+      <mass>1</mass>
+      <inertia>
+        <ixx>0</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0</iyy>
+        <iyz>0</iyz>
+        <izz>0</izz>
+      </inertia>
+    </inertial>
+  </link>
+  <joint name="base_link_to_right_wheel" type="continuous">
+    <parent>base_link</parent>
+    <child>right_wheel</child>
+    <pose>0 -0.08 -0.18 1.5707963267948966 0 0.030840783524403125</pose>
+  </joint>
+  <link name="lidar">
+    <pose>0.05 0.095 0 0 0 0</pose>
+    <collision name='lidar collision'>
+      <geometry>
+        <cylinder>
+          <radius>0.03000000000000003</radius>
+          <length>0.06000000000000006</length>
+        </cylinder>
+      </geometry>
+    </collision>
+    <visual name='lidar visual'>
+      <geometry>
+        <cylinder>
+          <radius>0.03000000000000003</radius>
+          <length>0.06000000000000006</length>
+        </cylinder>
+      </geometry>
+    </visual>
+    <material>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>Gazebo/Red</name>
+      </script>
+      <ambient>0.035601314869097636 0.6653872982754769 0.007499032040460618 1</ambient>
+      <diffuse>0.035601314869097636 0.6653872982754769 0.007499032040460618 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <emissive>0 0 0 1</emissive>
+    </material>
+    <inertial>
+      <mass>0.11</mass>
+      <inertia>
+        <ixx>0.00013199999999999996</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.00019799999999999996</iyy>
+        <iyz>0</iyz>
+        <izz>0.00013199999999999996</izz>
+      </inertia>
+    </inertial>
+
+    <sensor name="lidar" type="ray">
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <pose>-0.064 0 0.121 0 0 0</pose>
+        <update_rate></update_rate>
+        <ray>
+            <scan>
+                <horizontal>
+                    <samples>360</samples>
+                    <resolution>1</resolution>
+                    <min_angle></min_angle>
+                    <max_angle>6.28</max_angle>
+                </horizontal>
+            </scan>
+            <range>
+                <min>0.12</min>
+                <max>3</max>
+                <resolution>0.015</resolution>
+            </range>
+            <noise>
+                <type>gaussian</type>
+                <mean>0</mean>
+                <stddev>0.01</stddev>
+            </noise>
+        </ray>
+        <plugin name="turtlebot3_laserscan" filename="libgazebo_ros_ray_sensor.so">
+            <ros>
+                <remapping>~/out:=scan</remapping>
+            </ros>
+            <output_type>sensor_msgs/LaserScan</output_type>
+            <frame_name>base_scan</frame_name>
+        </plugin>
+    </sensor>
+  </link>
+  <joint name="base_link_to_lidar" type="fixed">
+    <parent>base_link</parent>
+    <child>lidar</child>
+    <pose>0.05 0.095 0 0 0 0</pose>
+  </joint>
+  <link name="imu">
+    <pose>0 0.08 0 0 0 0</pose>
+    <collision name='imu collision'>
+      <geometry>
+        <box>
+          <size>0.01 0.01 0.01</size>
+        </box>
+      </geometry>
+    </collision>
+    <visual name='imu visual'>
+      <geometry>
+        <box>
+          <size>0.01 0.01 0.01</size>
+        </box>
+      </geometry>
+    </visual>
+    <material>
+      <script>
+        <uri>file://media/materials/scripts/gazebo.material</uri>
+        <name>Gazebo/Red</name>
+      </script>
+      <ambient>0.48514994004665124 0.004776953478513362 0.6444796819634361 1</ambient>
+      <diffuse>0.48514994004665124 0.004776953478513362 0.6444796819634361 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <emissive>0 0 0 1</emissive>
+    </material>
+    <inertial>
+      <mass>1</mass>
+      <inertia>
+        <ixx>0.000016666666666666667</ixx>
+        <ixy>0</ixy>
+        <ixz>0</ixz>
+        <iyy>0.000016666666666666667</iyy>
+        <iyz>0</iyz>
+        <izz>0.000016666666666666667</izz>
+      </inertia>
+    </inertial>
+
+    <sensor name="imu" type="imu">
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <imu>
+            <angular_velocity>
+                <x>
+                    <noise type="gaussian">
+                        <mean>0</mean>
+                        <stddev>0</stddev>
+                    </noise>
+                </x>
+                <y>
+                    <noise type="gaussian">
+                        <mean>0</mean>
+                        <stddev>0</stddev>
+                    </noise>
+                </y>
+                <z>
+                    <noise type="gaussian">
+                        <mean>0</mean>
+                        <stddev>0</stddev>
+                    </noise>
+                </z>
+            </angular_velocity>
+            <linear_acceleration>
+                <x>
+                    <noise type="gaussian">
+                        <mean>0</mean>
+                        <stddev>0</stddev>
+                    </noise>
+                </x>
+                <y>
+                    <noise type="gaussian">
+                        <mean>0</mean>
+                        <stddev>0</stddev>
+                    </noise>
+                </y>
+                <z>
+                    <noise type="gaussian">
+                        <mean>0</mean>
+                        <stddev>0</stddev>
+                    </noise>
+                </z>
+            </linear_acceleration>
+        </imu>
+        <plugin name="turtlebot3_imu" filename="libgazebo_ros_imu_sensor.so">
+            <ros>
+                <remapping>~/out:=imu</remapping>
+            </ros>
+        </plugin>
+    </sensor>
+  </link>
+  <joint name="base_link_to_imu" type="fixed">
+    <parent>base_link</parent>
+    <child>imu</child>
+    <pose>0 0.08 0 0 0 0</pose>
+  </joint>
+</model>
+</sdf>
